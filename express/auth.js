@@ -11,9 +11,6 @@ function signupOld(username, email, password) {
   });
 }
 
-
-
-
 function loginOld(username, email, password) {
   let hash = "$2b$10$Fpma8gRVtocuGqul4tLokekGGONRu9HfmwDFGFQzLocdMCAzz3dZa";
 
@@ -25,7 +22,6 @@ function loginOld(username, email, password) {
     }
   });
 }
-
 
 
 const login  = () =>{
