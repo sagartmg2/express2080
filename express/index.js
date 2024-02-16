@@ -1,42 +1,51 @@
-const express = require("express")
-const app = express()
+const express = require("express");
+const app = express();
 
-let todos = ["html","css"]
-let loggedIn = false
+const {checkAuthentication,checkValidRole} =  require('./middleware/auth')
+/* object destructuring */
+
+let todos = ["html", "css"];
+
 
 /* middleware
      - simply a function which has access to req and res 
+        and can modify them 
      - next: points to the next upcomming valid middleware
 */
 
-function checkAuthentication(req, res , next){
-    if(!loggedIn){
-        return res.status(401).send()
-    }
-    console.log("checkAuthentication")
-    next()
+
+// app.use(checkAuthentication); // global middleware
+// app.use(checkValidRole); // global middleware
+app.use( express.json() ) // sets up req.body // () =>{  return (req,res,next) =>{ req.body = postman body }  }
+
+const createTodos = (req, res) => {
+    console.log(req.body)
+
+    /* input validation */
+
+    todos.push(req.body.title);
+    return res.send("todos creatred");
 }
 
-app.use(checkAuthentication)  // global middle-ware
 
-app.get("/api/todos",(req,res) =>{
-    console.log("response: list of todos ss.");
-    res.send(todos)
-})
+app.get("/api/todos", (req, res) => {
+  console.log("response: list of todos ss.");
+  res.send(todos);
+});
 
-app.post("/api/todos",(req,res) =>{
-    todos.push("git")
-    return res.send("todos creatred")
-})
 
-app.delete("/api/todos/reset",(req,res) =>{
-    todos = []
-    return res.status(204).send()
-})
 
-app.listen(8000, () =>{
-    console.log("server started..");
-})
+/* route level middleware */
+app.post("/api/todos", checkAuthentication,checkValidRole, createTodos );
+
+app.delete("/api/todos/reset",checkAuthentication,checkValidRole, (req, res) => {
+  todos = [];
+  return res.status(204).send();
+});
+
+app.listen(8000, () => {
+  console.log("server started..");
+});
 
 /* status codes
     2 200,201, 203, 204 - succes
@@ -48,5 +57,3 @@ app.listen(8000, () =>{
         404 - resoruce not found
 
 */
-
-
