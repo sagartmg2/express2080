@@ -1,11 +1,21 @@
 const express = require("express");
 const app = express();
 
-const {checkAuthentication,checkValidRole} =  require('./middleware/auth')
+const { checkAuthentication, checkValidRole } = require("./middleware/auth");
 /* object destructuring */
 
-let todos = ["html", "css"];
-
+let todos = [
+  {
+    id: 1,
+    title: "html",
+    status: true,
+  },
+  {
+    id: 2,
+    title: "css",
+    status: false,
+  },
+];
 
 /* middleware
      - simply a function which has access to req and res 
@@ -13,35 +23,74 @@ let todos = ["html", "css"];
      - next: points to the next upcomming valid middleware
 */
 
-
 // app.use(checkAuthentication); // global middleware
 // app.use(checkValidRole); // global middleware
-app.use( express.json() ) // sets up req.body // () =>{  return (req,res,next) =>{ req.body = postman body }  }
+
+app.use(express.json()); // sets up req.body // () =>{  return (req,res,next) =>{ req.body = postman body }  }
 
 const createTodos = (req, res) => {
-    console.log(req.body)
+  let inputTitle = req.body.title?.trim();
 
-    /* input validation */
+  // let todos = ["html","css"]
+  // inputTitle = "html"
 
-    todos.push(req.body.title);
-    return res.send("todos creatred");
-}
+  if (!inputTitle) {
+    return res.status(400).send({
+      errors: [
+        {
+          key: "title",
+          msg: "this field is required.", // TODO: send already exits
+        },
+      ],
+    });
+  }
 
+  // let matched = todos.find(el =>el === inputTitle) // html
+  let matched = todos.some((el) => el === inputTitle); // true
+
+  if (matched) {
+    return res.status(400).send({
+      errors: [
+        {
+          key: "title",
+          msg: "already exists",
+        },
+      ],
+    });
+  }
+
+  /* input validation */
+
+  todos.push(req.body.title);
+  return res.send("todos creatred");
+};
 
 app.get("/api/todos", (req, res) => {
   console.log("response: list of todos ss.");
   res.send(todos);
 });
 
-
-
 /* route level middleware */
-app.post("/api/todos", checkAuthentication,checkValidRole, createTodos );
+app.post("/api/todos", checkAuthentication, checkValidRole, createTodos);
 
-app.delete("/api/todos/reset",checkAuthentication,checkValidRole, (req, res) => {
-  todos = [];
-  return res.status(204).send();
-});
+app.put("/api/todos/:id",(req,res) =>{
+  /* code to update particular todo item from todos */
+  res.send(`update ${req.params.id}`)
+})
+app.delete("/api/todos/:id",(req,res) =>{
+  /* code to delete particular todo item from todos */
+  res.send(`delete ${req.params.id} `)
+})
+
+app.delete(
+  "/api/todos/reset",
+  checkAuthentication,
+  checkValidRole,
+  (req, res) => {
+    todos = [];
+    return res.status(204).send();
+  }
+);
 
 app.listen(8000, () => {
   console.log("server started..");

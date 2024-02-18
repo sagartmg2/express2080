@@ -2,8 +2,6 @@ let loggedIn = true;
 let hasValidRole = true
 
 function checkAuthentication(req, res, next) {
-
-    
     if (!loggedIn) {
       return res.status(401).send();
     }
