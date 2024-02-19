@@ -19,3 +19,23 @@ let output  = todos.some(el => el == inputTitle)
 console.log("output",output);
 
 console.log(matched); // output: true
+
+/* no sql  */
+
+let classes = [
+    {
+        grade:1,
+        sections:[
+            {
+                name:"A",
+                classTeacher:"abc",
+                students:[
+                    {
+                        name:"ram",
+                        age:11,
+                    }
+                ]
+            }
+        ]
+    }
+]

@@ -4,6 +4,8 @@ const app = express();
 const { checkAuthentication, checkValidRole } = require("./middleware/auth");
 /* object destructuring */
 
+let lastId = 2;
+
 let todos = [
   {
     id: 1,
@@ -61,7 +63,12 @@ const createTodos = (req, res) => {
 
   /* input validation */
 
-  todos.push(req.body.title);
+  lastId++;
+  
+  todos.push({
+    id: lastId,
+    title: req.body.title,
+  });
   return res.send("todos creatred");
 };
 
@@ -73,14 +80,36 @@ app.get("/api/todos", (req, res) => {
 /* route level middleware */
 app.post("/api/todos", checkAuthentication, checkValidRole, createTodos);
 
-app.put("/api/todos/:id",(req,res) =>{
+app.put("/api/todos/:id", (req, res) => {
   /* code to update particular todo item from todos */
-  res.send(`update ${req.params.id}`)
-})
-app.delete("/api/todos/:id",(req,res) =>{
+  /* map */
+
+  // todos // [ {id:1,html} , {id:2, css} ]
+  let existingTodo = todos.find(el => el.id == req.params.id)
+
+  if(!existingTodo){
+    return res.status(404).send()
+  }
+
+  todos = todos.map((el) => {
+    if (el.id == req.params.id) {
+      let newData = {
+        title: req.body.title,
+        status: req.body.status,
+      };
+      return newData;
+    } else {
+      return el;
+    }
+  });
+
+  res.send(`update ${req.params.id}`);
+});
+app.delete("/api/todos/:id", (req, res) => {
   /* code to delete particular todo item from todos */
-  res.send(`delete ${req.params.id} `)
-})
+  /* array.filter.. */
+  res.send(`delete ${req.params.id} `);
+});
 
 app.delete(
   "/api/todos/reset",
