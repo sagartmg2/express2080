@@ -4,12 +4,11 @@ const mongoose = require("mongoose");
 const app = express();
 app.use(express.json()); // global middleware, req.body
 
-const Book = require("./model/Book")
+const Book = require("./model/Book");
 
 mongoose
   .connect("mongodb://127.0.0.1:27017/bookStore")
   .then(() => console.log("Connected!"));
-
 
 /* 
 app.get("/api/books", (req, res) => {
@@ -22,67 +21,92 @@ app.get("/api/books", (req, res) => {
 
 */
 
-app.get("/api/books", async (req, res,next) => {
+app.get("/api/books", async (req, res, next) => {
   // db.books.find({})
   try {
-    let books = await Bookk.find({});
+    let books = await Book.find({});
     res.send(books);
   } catch (err) {
-    return next(err)
-    res.status(500).send({
-      msg: "Server error",
-      error: err.message,
-    });
+    return next(err);
   }
 });
 
-app.post("/api/books", async (req, res,next) => {
-  /* db.books.insertOne */
+/* client slide validation */
+app.post("/api/books", async (req, res, next) => {
   try {
     let { title, isbn } = req.body;
+
+    /* server side validation */
+    // if(!title){
+    //   return res.status(400).send("title is required.")
+    // }
+
     let book = await Book.create({ title: title, isbn });
     res.send(book);
   } catch (err) {
-    return next(err)
-    res.status(500).send({
-      msg: "Server error",
-    });
+    return next(err);
   }
 });
 
-app.put("/api/books/:_id", async (req, res,next) => {
+app.put("/api/books/:_id", async (req, res, next) => {
   try {
+    let matched = await Book.findById(req.params._id);
+    if (!matched) {
+      return res.status(404).send();
+    }
+
     let { title, isbn } = req.body;
     let book = await Book.findByIdAndUpdate(
       req.params._id,
       { title, isbn },
-      { new: true }
+      { new: true, runValidators: true }
     );
     res.send(book);
+
   } catch (err) {
-    return next(err)
-    res.status(500).send({
-      msg: "Server error",
-    });
+    return next(err);
+  }
+});
+
+app.delete("/api/books/:_id", async (req, res, next) => {
+  try {
+    let book = await Book.findByIdAndDelete(req.params._id);
+    res.status(204).send("");
+  } catch (err) {
+    return next(err);
   }
 });
 
 /* 
-    Book.findByIdAndUpdate("asdfasdf..",{})
     Book.findByIdAndDelete("id..asdfadf")
 */
 
-app.use((req,res) =>{
-  res.status(404).send({msg: "resource not found"})
-})
+app.use((req, res) => {
+  res.status(404).send({ msg: "resource not found" });
+});
 
 /* handle server error */
-app.use((err,req,res,next) =>{
-  res.status(500).send({
-    msg: " server error",
-    name: err.name
-  })
-})
+app.use((err, req, res, next) => {
+  let statusCode = 500;
+  let msg = "Server Error";
+
+  if (err.name === "ValidationError") {
+    statusCode = 400;
+    msg = "Bad Request / Please check your form ";
+  }
+
+  /* 
+    error = {
+      title: "already used",
+      isbn: "only numbers"
+    }
+      */
+  res.status(statusCode).send({
+    msg: msg,
+    name: err.name,
+    error: err,
+  });
+});
 
 app.listen(8000, () => {
   console.log("server started.");
