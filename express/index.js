@@ -5,6 +5,7 @@ const app = express();
 app.use(express.json()); // global middleware, req.body
 
 const Book = require("./model/Book");
+const Author = require("./model/Author");
 
 mongoose
   .connect("mongodb://127.0.0.1:27017/bookStore")
@@ -41,8 +42,19 @@ app.post("/api/books", async (req, res, next) => {
     //   return res.status(400).send("title is required.")
     // }
 
-    let book = await Book.create({ title: title, isbn });
+    let book = await Book.create(req.body);
     res.send(book);
+  } catch (err) {
+    return next(err);
+  }
+});
+
+app.post("/api/authors", async (req, res, next) => {
+  try {
+    let author = await Author.create({
+      name:"hari"
+    });
+    res.send(author);
   } catch (err) {
     return next(err);
   }
@@ -50,7 +62,7 @@ app.post("/api/books", async (req, res, next) => {
 
 app.put("/api/books/:_id", async (req, res, next) => {
   try {
-    let matched = await Book.findById(req.params._id);
+    let matched = await Bookk.findById(req.params._id);
     if (!matched) {
       return res.status(404).send();
     }
@@ -96,10 +108,18 @@ app.use((err, req, res, next) => {
   }
 
   /* 
+
     error = {
       title: "already used",
       isbn: "only numbers"
     }
+
+    errors: [
+      {field:"title",msg: "required field" },
+      {field:"isbn", msg: "numbers only" },
+    ]
+
+
       */
   res.status(statusCode).send({
     msg: msg,
