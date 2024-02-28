@@ -9,9 +9,9 @@ const {
 
 const router = express.Router();
 
-router.get("/api/products", fetchProducts);
-router.post("/api/products", storeProduct);
-router.put("/api/products/:_id", updateProduct);
-router.delete("/api/products/:_id", deleteProduct);
+router.get("", fetchProducts);
+router.post("", storeProduct);
+router.put("/:_id", updateProduct);
+router.delete("/:_id", deleteProduct);
 
 module.exports = router;
