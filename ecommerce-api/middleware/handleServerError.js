@@ -15,5 +15,6 @@ module.exports = (err, req, res, next) => {
   res.status(statusCode).send({
     msg,
     error,
+    stack: err.stack,
   });
 };
