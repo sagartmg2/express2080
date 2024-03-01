@@ -1,19 +1,9 @@
-const { removeAllListeners } = require("./model/Product");
 
-let products = [
-    {
-        name:"watch",
-        createBy:{
-            name:"ram",
-            contac:12212,
-        }
-    },
-    {
-        name:"watch-100",
-        createBy:{
-            name:"ram",
-            contac:12212,
-        }
-    }
-]
+let user = {
+    name:"ram",
+    doSomething: () =>{ console.log("user did something") }
+}
+
+user.doSomething()
+
 
