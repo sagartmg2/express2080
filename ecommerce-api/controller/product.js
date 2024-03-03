@@ -5,9 +5,16 @@ const fetchProducts = async (req, res) => {
   res.send(products);
 };
 
-const storeProduct = async (req, res) => {
-  let product = await Product.create({ title: "watch", price: 1000 });
-  res.send(product);
+const storeProduct = async (req, res, next) => {
+  try {
+    let product = await Product.create({
+      ...req.body,
+      createdBy: req.user._id,
+    });
+    res.send(product);
+  } catch (err) {
+    next(err);
+  }
 };
 
 const updateProduct = async (req, res) => {

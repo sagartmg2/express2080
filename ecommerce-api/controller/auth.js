@@ -1,6 +1,7 @@
 const Joi = require("joi");
 const User = require("../model/User");
 const bcrypt = require("bcrypt");
+var jwt = require("jsonwebtoken");
 
 /* 
      1. client side validation 
@@ -38,7 +39,10 @@ const signup = async (req, res, next) => {
   /* email validation  */
   let user = await User.findOne({ email: req.body.email });
   if (user) {
-    return res.status(400).send("email already exits.");
+    return res.status(400).send({
+      msg: "validatio error",
+      errors: [{ field: "email", msg: "already used" }],
+    });
   }
 
   try {
@@ -57,17 +61,25 @@ const signup = async (req, res, next) => {
 
 const login = async (req, res) => {
   /* server side validation for login  */
-  res.send({
-    token:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
-  })
-return
+
   let user = await User.findOne({ email: req.body.email }); // null
 
   if (user) {
-    /* check password */
+    let matched = await bcrypt.compare(req.body.password, user.password);
+
+    if (matched) {
+      user = user.toObject();
+      user.password = undefined;
+
+      const token = jwt.sign(user, "shhhhh");
+
+      return res.send({ token });
+    }
   }
 
-  res.status(401).send("invalid credentails");
+  res.status(401).send({
+    msg: "invalid credentials",
+  });
 };
 
 module.exports = {

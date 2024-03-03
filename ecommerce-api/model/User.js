@@ -10,6 +10,7 @@ const UserSchema = new Schema({
   email: {
     type: String,
     required: true,
+    /* custom validation  -- check email here.. */
   },
   phone: Number,
   password: {
@@ -17,7 +18,6 @@ const UserSchema = new Schema({
     required: true,
   },
 });
-
 
 const User = mongoose.model("User", UserSchema);
 
