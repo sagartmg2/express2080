@@ -1,20 +1,23 @@
 module.exports = (err, req, res, next) => {
   let statusCode = 500;
-  let error = err.name;
+  let errors = null;
   let msg = "Server Error";
 
   if (err.name == "ValidationError") {
     msg = "Bad Request / Validation Error";
     statusCode = 400;
-    error = {
-      email: "alerady exists",
-      password: "required field",
-    };
+    console.log(Object.entries(err.errors))
+    errors = [
+      {
+        msg: "validatio error",
+        errors: [{ field: "email", msg: "already used" }],
+      },
+    ];
   }
 
   res.status(statusCode).send({
     msg,
-    error,
+    errors,
     stack: err.stack,
   });
 };

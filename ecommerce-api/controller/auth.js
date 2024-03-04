@@ -57,7 +57,11 @@ const signup = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
+  
 };
+
+/*  stateful - session/cookie */
+/*  stateless - json */
 
 const login = async (req, res) => {
   /* server side validation for login  */
@@ -71,8 +75,7 @@ const login = async (req, res) => {
       user = user.toObject();
       user.password = undefined;
 
-      const token = jwt.sign(user, "yourSecreteSignature");
-
+      const token = jwt.sign(user, "yourSecreteSignature",{expiresIn:"7d"});
       return res.send({ token, user });
     }
   }
@@ -81,6 +84,11 @@ const login = async (req, res) => {
     msg: "invalid credentials",
   });
 };
+
+const logout = () =>{
+  /* token ..  */
+
+}
 
 module.exports = {
   signup,
