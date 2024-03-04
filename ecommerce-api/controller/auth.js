@@ -71,9 +71,9 @@ const login = async (req, res) => {
       user = user.toObject();
       user.password = undefined;
 
-      const token = jwt.sign(user, "shhhhh");
+      const token = jwt.sign(user, "yourSecreteSignature");
 
-      return res.send({ token });
+      return res.send({ token, user });
     }
   }
 

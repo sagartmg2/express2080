@@ -12,7 +12,7 @@ const router = express.Router();
 
 router.get("", fetchProducts);
 router.post("", checkAuthentication, storeProduct);
-router.put("/:_id", updateProduct);
+router.put("/:_id", checkAuthentication, updateProduct);
 router.delete("/:_id", deleteProduct);
 
 module.exports = router;
