@@ -1,7 +1,8 @@
 const jwt = require("jsonwebtoken");
+const { SELLER } = require("../constant/role");
 
 function checkAuthentication(req, res, next) {
-  let token = req.headers.authorization?.replaceAll("Bearer ", "");
+  let token =  req.headers.authorization?.replaceAll("Bearer ", "");
 
   if (token) {
     try {
@@ -21,6 +22,17 @@ function checkAuthentication(req, res, next) {
   });
 }
 
+const isSeller = (req, res, next) => {
+  if (req.user.role === SELLER) {
+    return next();
+  }
+  res.status(403).send({
+    msg: "only for seller",
+  });
+};
+
+
 module.exports = {
   checkAuthentication,
+  isSeller
 };

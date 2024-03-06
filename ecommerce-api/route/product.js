@@ -6,12 +6,14 @@ const {
   updateProduct,
   deleteProduct,
 } = require("../controller/product");
-const { checkAuthentication } = require("../middleware/auth");
+const { checkAuthentication, isSeller } = require("../middleware/auth");
 
 const router = express.Router();
 
+
+
 router.get("", fetchProducts);
-router.post("", checkAuthentication, storeProduct);
+router.post("", checkAuthentication, isSeller, storeProduct);
 router.put("/:_id", checkAuthentication, updateProduct);
 router.delete("/:_id", deleteProduct);
 

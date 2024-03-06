@@ -6,13 +6,15 @@ module.exports = (err, req, res, next) => {
   if (err.name == "ValidationError") {
     msg = "Bad Request / Validation Error";
     statusCode = 400;
-    console.log(Object.entries(err.errors))
-    errors = [
-      {
-        msg: "validatio error",
-        errors: [{ field: "email", msg: "already used" }],
-      },
-    ];
+    let errsArray = Object.entries(err.errors);
+    errors = [];
+
+    errsArray.forEach((el) => {
+      errors.push({
+        field: el[0],
+        msg: el[1].message,
+      });
+    });
   }
 
   res.status(statusCode).send({
