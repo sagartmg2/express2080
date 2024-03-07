@@ -37,6 +37,7 @@ const UserSchema = new Schema({
       return value.toLowerCase()
     }
   },
+  
 });
 
 const User = mongoose.model("User", UserSchema);

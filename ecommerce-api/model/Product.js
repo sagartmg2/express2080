@@ -9,6 +9,10 @@ const ProductSchema = new Schema({
     required: true,
     minLength: 3,
   },
+  description: {
+    type: String,
+    maxLength: 255,
+  },
   price: {
     type: Number,
     default: 0,
@@ -18,6 +22,9 @@ const ProductSchema = new Schema({
     type: ObjectId,
     ref: "User",
     required: true,
+  },
+  image: {
+    type: String,
   },
 });
 

@@ -1,4 +1,6 @@
 const express = require("express");
+const fileUpload = require("express-fileupload");
+
 const app = express();
 
 const productRoutes = require("./route/product");
@@ -8,6 +10,9 @@ const handleServerError = require("./middleware/handleServerError");
 require("./config/database");
 
 app.use(express.json()); // global middleware,  sets up req.body
+app.use(fileUpload()); // handles form-data
+
+app.use('/uploads', express.static('uploads'))
 
 app.use("/api/products", productRoutes);
 app.use("/api/auth", authRoutes);
