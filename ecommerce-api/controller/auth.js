@@ -16,7 +16,7 @@ const signupValidationSchema = Joi.object({
   .min(8)
   .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
   .required(),
-  // role: Joi.string().required(),
+  role: Joi.string().valid("buyer","seller").required(),
 });
 
 const signup = async (req, res, next) => {

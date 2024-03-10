@@ -1,7 +1,7 @@
 module.exports = (err, req, res, next) => {
-  let statusCode = 500;
+  let statusCode = err.statusCode || 500;
   let errors = null;
-  let msg = "Server Error";
+  let msg = err.msg || "Server Error";
 
   if (err.name == "ValidationError") {
     msg = "Bad Request / Validation Error";
