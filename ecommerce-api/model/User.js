@@ -8,6 +8,10 @@ const UserSchema = new Schema({
     type: String,
     required: true,
   },
+  address: {
+    street: String,
+    ward: Number,
+  },
   email: {
     // unique:true,
     type: String,
@@ -27,17 +31,17 @@ const UserSchema = new Schema({
   password: {
     type: String,
     required: true,
+    select: false,
   },
   role: {
     type: String,
-    enum: [ BUYER, SELLER],
+    enum: [BUYER, SELLER],
     required: true,
-    set:(value) =>{
+    set: (value) => {
       console.log(value);
-      return value.toLowerCase()
-    }
+      return value.toLowerCase();
+    },
   },
-  
 });
 
 const User = mongoose.model("User", UserSchema);

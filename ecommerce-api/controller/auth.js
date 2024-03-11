@@ -59,7 +59,7 @@ const signup = async (req, res, next) => {
 const login = async (req, res) => {
   /* server side validation for login  */
 
-  let user = await User.findOne({ email: req.body.email }); // null
+  let user = await User.findOne({ email: req.body.email }).select('+password'); // null
 
   if (user) {
     let matched = await bcrypt.compare(req.body.password, user.password);

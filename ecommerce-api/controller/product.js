@@ -6,14 +6,28 @@ const Joi = require("joi");
 const fetchProducts = async (req, res) => {
   // req.query.search
 
+  let sort = req.query.sort || "dateDesc";
+
+  let sortBy = {
+    createdAt: -1,
+  };
+
+  if (sort == "priceAsc") {
+    sortBy = { price: 1 };
+  } else if (sort == "priceDesc") {
+    sortBy = { price: -1 };
+  }
+
+
   let products = await Product.find({
-    title: new RegExp(req.query.search, "i"),
-  });
-  // .sort({ title: 1 });
+    title: new RegExp(req.query.search, "i")
+  }).sort(sortBy);
+
 
   /* 
     fid production between 500 - 1000  aggregation : advance find method
    */
+
 
   res.send(products);
 };
