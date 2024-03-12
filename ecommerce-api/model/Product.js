@@ -5,6 +5,10 @@ const ObjectId = Schema.ObjectId;
 
 const ProductSchema = new Schema(
   {
+    inStock: {
+      type: Number,
+      default: 0,
+    },
     title: {
       type: String,
       required: true,
@@ -32,6 +36,10 @@ const ProductSchema = new Schema(
     timestamps: true,
   }
 );
+
+ProductSchema.post("deleteOne", () => {
+  
+});
 
 const Product = mongoose.model("Product", ProductSchema);
 

@@ -1,5 +1,6 @@
 const Order = require("../model/Order");
 const Joi = require("joi");
+const Product = require("../model/Product");
 
 const sotreOrderValidationSchema = Joi.object({
   products: Joi.array()
@@ -30,25 +31,36 @@ const createOrder = async (req, res, next) => {
   }
 
   try {
-    /* req.body.products */
     let products = [];
 
-    /* TODO: code here to  populate price name 
-    await Product.findById(product_id)
-    products = [
-       {
-        "_id":"65eecf095f9316bd3772fe96",
-        "quantity":1,
-        price:100,
-        name:watch
-       }
-    ]
-    
-    */
+    /* TODO: validation for qunaity check.. .. send 400 if quanity exceeds. */
+
+    for (let index = 0; index < req.body.products.length; index++) {
+      // req.body.products.forEach(async (el) => {
+      let el = req.body.products[index];
+      let dbProduct = await Product.findById(el._id);
+      products.push({
+        _id: el._id,
+        title: dbProduct.title,
+        rate: dbProduct.price,
+        quantity: el.quantity,
+      });
+    }
 
     let order = await Order.create({
       products: products,
     });
+
+    /* 
+      this can also be done in mongoose post  save hook
+      let orderProducts = order.products;
+      orderProducts.forEach(async (el) => {
+      await Product.findByIdAndUpdate(el._id, {
+        $inc: { inStock: -el.quantity },
+      });
+      }); 
+    */
+
     res.send(order);
   } catch (err) {
     next(err);

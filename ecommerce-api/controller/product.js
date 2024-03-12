@@ -5,31 +5,42 @@ const Joi = require("joi");
 
 const fetchProducts = async (req, res) => {
   // req.query.search
+  try {
+    let sort = req.query.sort || "dateDesc";
+    let priceFrom = parseFloat(req.query.priceFrom) || 0;
+    let priceTo = parseFloat(req.query.priceTo) || 9999999999;
 
-  let sort = req.query.sort || "dateDesc";
+    let sortBy = {
+      createdAt: -1,
+    };
 
-  let sortBy = {
-    createdAt: -1,
-  };
+    if (sort == "priceAsc") {
+      sortBy = { price: 1 };
+    } else if (sort == "priceDesc") {
+      sortBy = { price: -1 };
+    } else if (sort == "titleAsc") {
+      sortBy = { title: 1 };
+    } else if (sort == "titleDesc") {
+      sortBy = { title: -1 };
+    }
 
-  if (sort == "priceAsc") {
-    sortBy = { price: 1 };
-  } else if (sort == "priceDesc") {
-    sortBy = { price: -1 };
-  }
+    /* 
+      price: { $gte: 300 },
+      price: { $lte: 1000 },
+    */
+    let products = await Product.find({
+      title: new RegExp(req.query.search, "i"),
+      $and: [{ price: { $gte: priceFrom } }, { price: { $lte: priceTo } }],
+    }).sort(sortBy);
 
-
-  let products = await Product.find({
-    title: new RegExp(req.query.search, "i")
-  }).sort(sortBy);
-
-
-  /* 
+    /* 
     fid production between 500 - 1000  aggregation : advance find method
    */
 
-
-  res.send(products);
+    res.send(products);
+  } catch (err) {
+    next(err);
+  }
 };
 
 const storeProductValidationSchema = Joi.object({
@@ -119,7 +130,9 @@ const deleteProduct = async (req, res, next) => {
 
     // let product = await Product.findByIdAndDelete(req.params._id);
     let product = await Product.deleteOne({ _id: req.params._id });
-    fs.unlinkSync(path.join(path.resolve(), product.image));
+    fs.unlink(path.join(path.resolve(), product.image), (err, data) => {
+      console.log(err);
+    });
     res.send("product deleted");
   } catch (err) {
     next(err);
