@@ -7,7 +7,7 @@ const productRoutes = require("./route/product");
 const authRoutes = require("./route/auth");
 const orderRoutes = require("./route/order")
 const handleServerError = require("./middleware/handleServerError");
-
+require('dotenv').config()
 require("./config/database");
 
 app.use(express.json()); // global middleware,  sets up req.body
@@ -23,6 +23,10 @@ app.use("/api/orders", orderRoutes);
 app.use(handleServerError);
 // fs.writeFileSync(path.join(path.resolve(),"custom.txt"),"our text" );
 // fs.unlinkSync(path.join(path.resolve(),"custom.txt"))
+
+app.use("/api/test",() =>{
+  res.send("test")
+})
 
 app.listen(8000, () => {
   console.log("server started.");

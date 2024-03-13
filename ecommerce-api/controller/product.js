@@ -9,6 +9,8 @@ const fetchProducts = async (req, res) => {
     let sort = req.query.sort || "dateDesc";
     let priceFrom = parseFloat(req.query.priceFrom) || 0;
     let priceTo = parseFloat(req.query.priceTo) || 9999999999;
+    let perPage = parseInt(req.query.perPage) || 5;
+    let page = parseInt(req.query.page) || 1;
 
     let sortBy = {
       createdAt: -1,
@@ -24,20 +26,69 @@ const fetchProducts = async (req, res) => {
       sortBy = { title: -1 };
     }
 
-    /* 
-      price: { $gte: 300 },
-      price: { $lte: 1000 },
-    */
-    let products = await Product.find({
+    let productFilter = {
       title: new RegExp(req.query.search, "i"),
       $and: [{ price: { $gte: priceFrom } }, { price: { $lte: priceTo } }],
-    }).sort(sortBy);
+    };
+
+    let products = await Product.find(productFilter)
+      .sort(sortBy)
+      .skip((page - 1) * perPage)
+      .limit(perPage)
+      .populate("createdBy");
+
+    let totalProducts = await Product.countDocuments(productFilter);
 
     /* 
     fid production between 500 - 1000  aggregation : advance find method
    */
 
-    res.send(products);
+    products = await Product.aggregate([
+      {
+        $match: {
+          title: new RegExp(req.query.search, "i"),
+        },
+      },
+      {
+        $match: {
+          $and: [{ price: { $gte: priceFrom } }, { price: { $lte: priceTo } }],
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "createdBy",
+          foreignField: "_id",
+          as: "createdBy",
+        },
+      },
+      {
+        $unwind: "$createdBy",
+      },
+      // {
+      //   $project: {
+      //     "createdBy.name": 1,
+      //     "createdBy.email": 1,
+      //   },
+      // },
+      // {
+      //   $facet:{
+      //   }
+      // }
+      {
+        $skip: (page - 1) * perPage,
+      },
+      {
+        $limit: perPage,
+      },
+    ]);
+
+    res.send({
+      page: page,
+      perPage: perPage,
+      total: totalProducts,
+      data: products,
+    });
   } catch (err) {
     next(err);
   }
@@ -59,7 +110,11 @@ const storeProductValidationSchema = Joi.object({
     ),
   }),
   title: Joi.required(),
+  price: Joi.number().required().min(0),
 });
+
+// axios.get("https:///")
+// axios.get("localhost:8000")
 
 const storeProduct = async (req, res, next) => {
   /* TODO: try to re-use this joi validation code. also being used in singup */

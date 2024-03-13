@@ -12,6 +12,7 @@ const sotreOrderValidationSchema = Joi.object({
     .required(),
 });
 
+
 const createOrder = async (req, res, next) => {
   try {
     await sotreOrderValidationSchema.validateAsync(req.body, {
@@ -31,9 +32,11 @@ const createOrder = async (req, res, next) => {
   }
 
   try {
+
     let products = [];
 
     /* TODO: validation for qunaity check.. .. send 400 if quanity exceeds. */
+
 
     for (let index = 0; index < req.body.products.length; index++) {
       // req.body.products.forEach(async (el) => {
@@ -51,15 +54,17 @@ const createOrder = async (req, res, next) => {
       products: products,
     });
 
-    /* 
-      this can also be done in mongoose post  save hook
+    
+      // this can also be done in mongoose post  save hook
+     /*  
       let orderProducts = order.products;
-      orderProducts.forEach(async (el) => {
-      await Product.findByIdAndUpdate(el._id, {
-        $inc: { inStock: -el.quantity },
-      });
-      }); 
-    */
+        orderProducts.forEach(async (el) => {
+        await Product.findByIdAndUpdate(el._id, {
+          $inc: { inStock: -el.quantity },
+        });
+        }); 
+      */
+   
 
     res.send(order);
   } catch (err) {

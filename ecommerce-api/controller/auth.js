@@ -68,7 +68,7 @@ const login = async (req, res) => {
       user = user.toObject();
       user.password = undefined;
 
-      const token = jwt.sign(user, "yourSecreteSignature",{expiresIn:"7d"});
+      const token = jwt.sign(user, process.env.JWT_SECRET,{expiresIn:"7d"});
       return res.send({ token, user });
     }
   }

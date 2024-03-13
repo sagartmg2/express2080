@@ -5,6 +5,7 @@ const ObjectId = Schema.ObjectId;
 
 const ProductSchema = new Schema(
   {
+    // category:[String],
     inStock: {
       type: Number,
       default: 0,
