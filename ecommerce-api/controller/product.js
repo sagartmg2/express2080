@@ -94,49 +94,14 @@ const fetchProducts = async (req, res) => {
   }
 };
 
-const storeProductValidationSchema = Joi.object({
-  image: Joi.object({
-    size: Joi.number()
-      .max(2 * 1024 * 1024)
-      .messages({
-        "number.max": "file must be less than 2mb ",
-      }),
-    mimetype: Joi.string().valid(
-      "image/jpeg",
-      "image/jpg",
-      "image/png",
-      "image/svg",
-      "image/webp"
-    ),
-  }),
-  title: Joi.required(),
-  price: Joi.number().required().min(0),
-});
+
 
 // axios.get("https:///")
 // axios.get("localhost:8000")
 
 const storeProduct = async (req, res, next) => {
   /* TODO: try to re-use this joi validation code. also being used in singup */
-  try {
-    await storeProductValidationSchema.validateAsync(
-      { ...req.body, ...req.files },
-      {
-        allowUnknown: true,
-        abortEarly: false,
-      }
-    );
-  } catch (err) {
-    return res.status(400).send({
-      msg: "validation error",
-      errors: err.details.map((el) => {
-        return {
-          field: el.context.key,
-          msg: el.message,
-        };
-      }),
-    });
-  }
+  
   try {
     let imagePath = null;
 
